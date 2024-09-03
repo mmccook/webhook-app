@@ -1,0 +1,18 @@
+package template
+
+
+templ Index() {
+    @DocType()
+    @Head()
+    @Body(pageIndex(), Sidebar())
+
+}
+
+templ pageIndex() {
+    <button class="text-lg" hx-post="/" hx-trigger="click" >Go to Your Section</button>
+}
+
+templ ButtonResponse(){
+    <p>Poop</p>
+}
+

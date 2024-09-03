@@ -1,0 +1,14 @@
+package template
+
+import "fmt"
+
+templ SectionDash(id string) {
+    @DocType()
+    @Head()
+    @Body(pageDashboard(id), Sidebar())
+}
+
+templ pageDashboard(id string) {
+    <p>{id}</p>
+    <button hx-post={fmt.Sprintf("/sections/%s/webhooks",id)} hx-trigger="click">Webhook Test</button>
+}
