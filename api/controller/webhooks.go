@@ -12,93 +12,94 @@ import (
 )
 
 type Webhooks struct {
-	Config *config.ApiConfig
+	BaseController
 }
 
-func (controller *Webhooks) Route(sectionGroup *echo.Group) {
-	sectionGroup.GET("/:sectionId/webhooks", getWebhookListHandler(controller.Config))
-	sectionGroup.POST("/:sectionId/webhooks", postWebhookHandler(controller.Config))
+func (controller *Webhooks) Route() {
+	var group = controller.App.Group("/sections")
+	group.GET("/:sectionId/webhooks", controller.getWebhookListHandler)
+	group.POST("/:sectionId/webhooks", controller.postWebhookHandler)
 }
 
-func getWebhookListHandler(config *config.ApiConfig) func(c echo.Context) error {
-	return func(c echo.Context) error {
-		var sectionId, err = strconv.ParseUint(c.Param("sectionId"), 10, 64)
-		if err != nil {
-			return err
-		}
-
-		sectionIdStr := strconv.FormatUint(sectionId, 10)
-
-		redisKey := fmt.Sprintf("%s::webhooks", sectionIdStr)
-
-		redisCtx := context.Background()
-
-		rcmd := config.DB.JSONGet(redisCtx, redisKey, "$")
-
-		result, err := rcmd.Result()
-		if err != nil {
-			config.Log.Log().Timestamp().Msg(err.Error())
-			return err
-		}
-
-		var data []entity.Webhook
-		err = json.Unmarshal([]byte(result), &data)
-		if err != nil {
-			config.Log.Log().Timestamp().Msg(err.Error())
-			return c.JSON(http.StatusBadRequest, err.Error())
-		}
-
-		return c.JSON(200, data)
+func (controller *Webhooks) getWebhookListHandler(c echo.Context) error {
+	var sectionId, err = controller.parseSectionID(c.Param("sectionId"))
+	if err != nil {
+		return err
 	}
-}
-func postWebhookHandler(config *config.ApiConfig) func(c echo.Context) error {
-	return func(c echo.Context) error {
-		var sectionId, err = strconv.ParseUint(c.Param("sectionId"), 10, 64)
-		if err != nil {
-			return err
-		}
-		sectionIdStr := strconv.FormatUint(sectionId, 10)
 
-		redisKey := fmt.Sprintf("%s::webhooks", sectionIdStr)
+	sectionIdStr := strconv.FormatUint(sectionId, 10)
 
-		var headers []entity.HttpHeader
-		for name, values := range c.Request().Header {
-			// Loop over all values for the name.
-			for _, value := range values {
-				headers = append(headers, entity.HttpHeader{
-					Name:  name,
-					Value: value,
-				})
-			}
-		}
+	redisKey := fmt.Sprintf("%s::webhooks", sectionIdStr)
 
-		webhook := entity.Webhook{
-			SectionId: sectionIdStr,
-			OriginUrl: c.Request().RemoteAddr,
-			Headers:   headers,
-		}
-		redisCtx := context.Background()
+	redisCtx := context.Background()
 
-		result, err := webhook.MarshalBinary()
-		if err != nil {
-			config.Log.Log().Timestamp().Msg(err.Error())
-			return err
-		}
-		rcmd := config.DB.JSONArrAppend(redisCtx, redisKey, "$", result)
-		err = rcmd.Err()
-		if err != nil {
-			config.Log.Log().Timestamp().Msg(err.Error())
-			return err
-		}
-		return c.JSON(200, webhook)
+	rcmd := controller.DB.JSONGet(redisCtx, redisKey, "$")
 
+	result, err := rcmd.Result()
+	if err != nil {
+		controller.Log.Log().Timestamp().Msg(err.Error())
+		return err
 	}
+
+	var data []entity.Webhook
+	err = json.Unmarshal([]byte(result), &data)
+	if err != nil {
+		controller.Log.Log().Timestamp().Msg(err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(200, data)
+
+}
+func (controller *Webhooks) postWebhookHandler(c echo.Context) error {
+
+	var sectionId, err = controller.parseSectionID(c.Param("sectionId"))
+	if err != nil {
+		return err
+	}
+	sectionIdStr := strconv.FormatUint(sectionId, 10)
+
+	redisKey := fmt.Sprintf("section:%s:webhooks", sectionIdStr)
+
+	var headers []entity.HttpHeader
+	for name, values := range c.Request().Header {
+		// Loop over all values for the name.
+		for _, value := range values {
+			headers = append(headers, entity.HttpHeader{
+				Name:  name,
+				Value: value,
+			})
+		}
+	}
+
+	webhook := entity.Webhook{
+		SectionId: sectionIdStr,
+		OriginUrl: c.Request().RemoteAddr,
+		Headers:   headers,
+	}
+	redisCtx := context.Background()
+
+	result, err := webhook.MarshalBinary()
+	if err != nil {
+		controller.Log.Log().Timestamp().Msg(err.Error())
+		return err
+	}
+	rcmd := controller.DB.JSONArrAppend(redisCtx, redisKey, "$", result)
+	err = rcmd.Err()
+	if err != nil {
+		controller.Log.Log().Timestamp().Msg(err.Error())
+		return err
+	}
+	return c.JSON(200, webhook)
+
 }
 
-func InitWebhooksRouter(config *config.ApiConfig, group *echo.Group) Webhooks {
+func InitWebhooksRouter(config *config.ApiConfig) Webhooks {
 	webhooks := Webhooks{
-		Config: config,
+		BaseController{
+			config,
+		},
 	}
-	webhooks.Route(group)
+	webhooks.Route()
 	return webhooks
 }

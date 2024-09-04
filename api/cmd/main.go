@@ -24,6 +24,7 @@ func main() {
 	config.ApiBootstrap(&appConfig)
 
 	controller.InitSectionRouter(&appConfig)
+	controller.InitWebhooksRouter(&appConfig)
 
 	var server = config.SetupServer(&appConfig)
 

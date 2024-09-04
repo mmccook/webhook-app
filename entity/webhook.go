@@ -1,6 +1,9 @@
 package entity
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type Webhook struct {
 	SectionId string       `json:"sectionId"`
@@ -8,12 +11,16 @@ type Webhook struct {
 	Headers   []HttpHeader `json:"headers"`
 }
 
-func (m *Webhook) UnmarshalBinary(data []byte) error {
-	return json.Unmarshal(data, m)
+func (entity *Webhook) RedisKey() string {
+	return fmt.Sprintf("section:%s:webhooks", entity.SectionId)
 }
 
-func (m *Webhook) MarshalBinary() (data []byte, err error) {
-	return json.Marshal(m)
+func (entity *Webhook) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, entity)
+}
+
+func (entity *Webhook) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(entity)
 }
 
 type HttpHeader struct {
