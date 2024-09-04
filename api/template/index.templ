@@ -4,7 +4,9 @@ package template
 templ Index() {
     @DocType()
     @Head()
-    @Body(pageIndex(), Sidebar())
+    @Body() {
+        @pageIndex()
+    }
 
 }
 

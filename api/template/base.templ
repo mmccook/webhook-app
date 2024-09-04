@@ -9,24 +9,6 @@ templ Head() {
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<script src="https://cdn.tailwindcss.com"></script>
-		<script>
-            tailwind.config = {
-              theme: {
-                extend: {
-                  colors: {
-                    clifford: '#da373d',
-                  }
-                }
-              }
-            }
-        </script>
-		<style type="text/tailwindcss">
-            @layer utilities {
-              .content-auto {
-                content-visibility: auto;
-              }
-            }
-        </style>
 		<script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr" crossorigin="anonymous"></script>
 		<script src="https://unpkg.com/htmx-ext-alpine-morph@2.0.0/alpine-morph.js"></script>
 		<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/morph@3.x.x/dist/cdn.min.js"></script>
@@ -35,12 +17,11 @@ templ Head() {
 	</head>
 }
 
-templ Body(component templ.Component, sidebar templ.Component) {
+templ Body() {
     <div>
-        @sidebar
-        <main class="py-10 lg:pl-72">
-            <div class="px-4 sm:px-6 lg:px-8">
-              @component
+        <main>
+            <div class="py-4 px-4 sm:px-6  lg:px-8">
+              { children... }
             </div>
         </main>
     </div>

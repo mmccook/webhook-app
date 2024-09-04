@@ -5,7 +5,9 @@ import "fmt"
 templ SectionDash(id string) {
     @DocType()
     @Head()
-    @Body(pageDashboard(id), Sidebar())
+    @Body() {
+        pageDashboard(id)
+    }
 }
 
 templ pageDashboard(id string) {
