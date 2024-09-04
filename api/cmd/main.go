@@ -21,8 +21,6 @@ func main() {
 		Config:   viperConfig,
 	}
 
-	config.ApiBootstrap(&appConfig)
-
 	controller.InitSectionRouter(&appConfig)
 	controller.InitWebhooksRouter(&appConfig)
 

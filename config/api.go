@@ -23,10 +23,6 @@ type ApiConfig struct {
 	Config   *viper.Viper
 }
 
-func ApiBootstrap(config *ApiConfig) {
-
-}
-
 func SetupApp(viper *viper.Viper) *echo.Echo {
 	echoApp := echo.New()
 	SetupEchoMiddleware(echoApp, viper)
@@ -56,7 +52,6 @@ func SetupEchoMiddleware(echoApp *echo.Echo, config *viper.Viper) {
 				Str("URI", v.URI).
 				Int("status", v.Status).
 				Msg("request")
-
 			return nil
 		},
 	}))

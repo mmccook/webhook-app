@@ -1,4 +1,4 @@
-BINARY_NAME=test-mmm
+BINARY_NAME=webhook-app
 
 ifeq ($(OS),Windows_NT)
     SHELL := pwsh.exe
@@ -6,7 +6,6 @@ else
    SHELL := pwsh
 endif
 .SHELLFLAGS := -NoProfile -Command
-
 
 build:
 	go build -o build/${BINARY_NAME}-linux64 ./api/cmd/main.go
