@@ -5,7 +5,6 @@ import (
 	"DJMIL/service"
 	"encoding/json"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 )
 
 type WebhooksController struct {
@@ -22,11 +21,7 @@ func (controller *WebhooksController) postWebhookHandler(c echo.Context) error {
 	var sectionIdStr = c.Param("sectionId")
 
 	jsonBody := make(map[string]interface{})
-	err := json.NewDecoder(c.Request().Body).Decode(&jsonBody)
-	if err != nil {
-		log.Error(err)
-		log.Error("empty json body")
-	}
+	_ = json.NewDecoder(c.Request().Body).Decode(&jsonBody)
 
 	webhook, err := controller.webhookService.CreateWebhook(sectionIdStr, c.Request().RemoteAddr, c.Request().Header, jsonBody)
 
