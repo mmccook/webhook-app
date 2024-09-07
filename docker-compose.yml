@@ -8,3 +8,22 @@ services:
       - .:/opt/app
     ports:
       - "8085:8085"
+  caddy:
+    image: caddy:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    restart: unless-stopped
+
+  redis:
+    image: redis/redis-stack:latest
+    ports:
+      - "6677:6379"
+      - "8001:8001" # RedisInsight
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:

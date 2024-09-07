@@ -1,0 +1,3 @@
+# Webhooks
+
+Needs to set webhooks.internal and redis-dash.webhooks.internal in your hosts file for the caddy reverse proxy to work.

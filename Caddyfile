@@ -1,0 +1,14 @@
+{
+    debug
+    email mark.mccook@gmail.com
+}
+
+webhooks.internal:80 http://webhooks.internal webhooks.internal {
+    tls internal
+    reverse_proxy http://app:8085
+}
+
+redis-dash.webhooks.internal {
+    tls internal
+    reverse_proxy http://redis:8001
+}
